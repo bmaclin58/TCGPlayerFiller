@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
+
 def search_for_card(driver, card_name, set_name):
 	"""Search for a card by name and set the Product Line to Magic and Set Name"""
 	try:
@@ -15,9 +16,12 @@ def search_for_card(driver, card_name, set_name):
 		search_field.clear()
 		search_field.send_keys(card_name)
 
+
 		# Set Product Line to Magic
 		product_line_select = Select(driver.find_element(By.ID, "CategoryId"))
 		product_line_select.select_by_visible_text("Magic")
+
+		time.sleep(1)
 
 		# Set the Set Name
 		set_select = Select(driver.find_element(By.ID, "SetNameId"))
@@ -54,9 +58,6 @@ def search_for_card(driver, card_name, set_name):
 			print(f"No match found for set: {set_name}. Using 'All Set Names' instead.")
 			set_select.select_by_visible_text("All Set Names")
 
-		# Click Search button
-		search_button = driver.find_element(By.ID, "Search")
-		search_button.click()
 
 		# Wait for search results
 		try:

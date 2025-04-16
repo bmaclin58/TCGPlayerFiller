@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
-from config import LOGIN_URL, PASSWORD, USERNAME
+from config import LOGIN_URL
 
 
 def setup_driver():
@@ -23,7 +23,7 @@ def setup_driver():
 
 		# Do not add the --headless flag as it makes detection more likely
 
-		driver = uc.Chrome(options=options,use_subprocess=False)
+		driver = uc.Chrome(options=options, use_subprocess=False)
 		driver.maximize_window()
 		return driver
 
@@ -45,12 +45,11 @@ def setup_regular_driver():
 
 
 def login(driver):
-	"""Login to TCGPlayer admin page"""
+	"""Login with explicit manual intervention for reliability"""
 	driver.get(LOGIN_URL)
 
-	# Wait for the login form to appear
 	try:
-		# Check if we're already logged in by looking for a common element on the dashboard
+		# Check if already logged in
 		try:
 			already_logged_in = WebDriverWait(driver, 5).until(
 					EC.presence_of_element_located((By.CSS_SELECTOR, "#sellerportal-navigation-app-container"))
@@ -58,52 +57,29 @@ def login(driver):
 			print("Already logged in!")
 			return True
 		except TimeoutException:
-			# Not logged in, proceed with login
+			# Not logged in, continue with manual login
 			pass
 
-		username_field = WebDriverWait(driver, 30).until(
-				EC.presence_of_element_located((By.ID, "tcg-input-7"))
-		)
-		password_field = driver.find_element(By.ID, "tcg-input-10")
+		print("\n=== MANUAL LOGIN REQUIRED ===")
+		print("1. Please log in manually in the browser window.")
+		print("2. Use your TCGPlayer credentials.")
+		print("3. Solve any CAPTCHA if present.")
+		input("Press Enter once you've logged in to continue...")
 
-		captcha_detected = driver.find_elements(By.CSS_SELECTOR,
-		                                        ".g-recaptcha, .recaptcha, iframe[title*='recaptcha'], iframe[src*='recaptcha']")
-		if captcha_detected:
-			handle_captcha(driver)
-			print("CAPTCHA solved, continuing with login...")
+		# Verify successful login
+		try:
+			WebDriverWait(driver, 10).until(
+					EC.url_contains("admin/product/catalog")
+			)
+			print("Login successful!")
+			return True
+		except TimeoutException:
+			print("Login verification failed. Please make sure you're properly logged in.")
+			return False
 
-		username_field.send_keys(USERNAME)
-		password_field.send_keys(PASSWORD)
-
-		login_button = driver.find_element(By.CLASS_NAME, "tcg-standard-button")
-		login_button.click()
-
-		# Wait for the page to load after login
-		WebDriverWait(driver, 30).until(
-				EC.url_contains("admin/product/catalog")
-		)
-		print("Login successful!")
-	except TimeoutException:
-		print("Login page elements not found or timed out.")
-		return False
 	except Exception as e:
-		print(f"Login failed: {e}")
+		print(f"Login process error: {e}")
 		return False
-
-	return True
-
-
-def handle_captcha(driver):
-	"""Pauses execution and waits for user to manually solve CAPTCHA"""
-	try:
-		print("\n\n=== CAPTCHA DETECTED! ===")
-		print("Please solve the CAPTCHA in the browser window.")
-		input("Press Enter once you've solved the CAPTCHA to continue...")
-		return True
-	except Exception as e:
-		print(f"Error checking for CAPTCHA: {e}")
-
-	return False
 
 
 def humanize_actions(driver):
