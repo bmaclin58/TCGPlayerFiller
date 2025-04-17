@@ -77,9 +77,10 @@ def search_for_card(driver, card_name, set_name):
 def process_card(driver, card_data):
 	"""Process a single card - get price, set discounted price, and quantity"""
 	try:
+		time.sleep(1)
 		# Find the current price
 		price_element = WebDriverWait(driver, 10).until(
-				EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-bind='formatCurrency: lowestPrice']"))
+				EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-bind='formatCurrency: marketPrice']"))
 		)
 		current_price_text = price_element.text.replace('$', '').strip()
 		current_price = float(current_price_text)
@@ -102,7 +103,7 @@ def process_card(driver, card_data):
 		save_button.click()
 
 		# Wait for save to complete
-		time.sleep(2)
+		time.sleep(3)
 
 		print(
 			f"Processed {card_data['Product Name']} - Original price: ${current_price}, New price: ${discounted_price}, Quantity: {card_data['Quantity']}")
