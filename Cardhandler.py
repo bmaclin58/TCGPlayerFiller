@@ -17,7 +17,7 @@ def load_card_data(file_path):
 		df = pd.read_excel(file_path, header=None)
 		# Assuming column structure based on your data sample
 		df.columns = ['Product Line', 'Set Name', 'Product Name', 'Number', 'Rarity',
-		              'Quantity', 'TCG Marketplace Price', 'Foil', 'Language']
+		              'Quantity', 'TCG Marketplace Price', 'Foil', 'Language','Status']
 
 		# Add status column if it doesn't exist
 		if 'Status' not in df.columns:

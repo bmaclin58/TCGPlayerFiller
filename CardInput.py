@@ -9,12 +9,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 def search_for_card(driver, card_name, set_name):
 	"""Search for a card by name and set the Product Line to Magic and Set Name"""
 	try:
-		# Clear search field and enter card name
-		search_field = WebDriverWait(driver, 10).until(
-				EC.element_to_be_clickable((By.ID, "SearchValue"))
-		)
-		search_field.clear()
-		search_field.send_keys(card_name)
+
 
 
 		# Set Product Line to Magic
@@ -25,7 +20,12 @@ def search_for_card(driver, card_name, set_name):
 
 		# Set the Set Name
 		set_select = Select(driver.find_element(By.ID, "SetNameId"))
-
+		# Clear search field and enter card name
+		search_field = WebDriverWait(driver, 10).until(
+				EC.element_to_be_clickable((By.ID, "SearchValue"))
+		)
+		search_field.clear()
+		search_field.send_keys(card_name)
 		# Try to find the correct set by different methods
 		found = False
 
@@ -103,7 +103,7 @@ def process_card(driver, card_data):
 		save_button.click()
 
 		# Wait for save to complete
-		time.sleep(3)
+		time.sleep(2)
 
 		print(
 			f"Processed {card_data['Product Name']} - Original price: ${current_price}, New price: ${discounted_price}, Quantity: {card_data['Quantity']}")
